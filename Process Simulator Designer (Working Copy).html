@@ -11,6 +11,25 @@
     <meta name="author" content="Yuvraj Singh Bawa, Puneet Randar">
     <title>Process Simulator Designer (Working Copy)</title>
     <style>
+
+    button {
+	  background-color: #e7e7e7; color: black;
+	  border: 1px solid black;
+	  padding: 5px;
+	  text-align: center;
+	  text-decoration: none;
+	  display: inline-block;
+	  font-size: 14px;
+	}
+
+	button {
+  transition-duration: 0.4s;
+}
+
+button:hover {
+  background-color: white; /* Green */
+  color: black;
+}
       body {
         margin: 0;
         padding: 0;
@@ -37,9 +56,12 @@
 		  margin: 15% auto; /* 15% from the top and centered */
 		  padding: 20px;
 		  border: 1px solid #888;
-		  width: 80%; /* Could be more or less, depending on screen size */
-		}
+		  width: 50%; /* Could be more or less, depending on screen size */
 
+		}
+		.modal-content input {
+			margin: 5px;
+		}
 		/* The Close Button */
 		.close {
 		  color: #aaa;
@@ -81,18 +103,19 @@
     Mean time before failure (m<sub>f</sub>): <input type="number" id="mf" /><br/>
 	Mean time to repair (m<sub>r</sub>): <input type="number" id="mr"><br/>
     Setup Time Configuration:<br />
-    Distribution: <input type="radio" id="deterministic" name="distribution" value="deterministic" onclick="distributionCheck()">
+    Distribution: 
+    <br/><input type="radio" id="deterministic" name="distribution" value="deterministic" onclick="distributionCheck()">
 	  <label for="male">Deterministic</label><br>
 	  <input type="radio" id="exponential" name="distribution" value="exponential" onclick="distributionCheck()">
 	  <label for="female">Exponential</label><br>
 	  <input type="radio" id="normal" name="distribution" value="normal" onclick="distributionCheck()">
 	  <label for="other">Normal</label>
-	  <label id="det-time-label"  style="display:none">Setup time: </label><input type="number" id="det-time" min="0" style="display:none" /><br id="det-timebr" style="display:none"/>
-	<label id="exp-mean-time-label" style="display:none">Mean setup time:</label> <input type="number" id="exp-mean-time" min="0" style="display:none" /><br id="exp-mean-timebr" style="display:none"/>
-	<label id="norm-mean-time-label" style="display:none">Mean setup time: </label><input type="number" id="norm-mean-time" min="0" style="display:none" /><br id="norm-mean-timebr" style="display:none"/>
-	<label id="norm-sd-label" style="display:none">Standard deviation: </label><input type="number" id="norm-sd" min="0" style="display:none" /><br id="norm-sdbr" style="display:none"/>
+	  <label id="det-time-label"  style="display:none">Setup time: </label><input type="number" id="det-time" min="0" style="display:none" />
+	<label id="exp-mean-time-label" style="display:none">Mean setup time:</label> <input type="number" id="exp-mean-time" min="0" style="display:none" />
+	<label id="norm-mean-time-label" style="display:none">Mean setup time: </label><input type="number" id="norm-mean-time" min="0" style="display:none" />
+	<label id="norm-sd-label" style="display:none">Standard deviation: </label><input type="number" id="norm-sd" min="0" style="display:none" />
 	
-	<button id="submitResourceInfo">Add</button>
+	<button id="submitResourceInfo" style="display: block;">Add</button>
   </div>
 
 </div>
@@ -116,12 +139,12 @@
 	  <label for="female">Exponential</label><br>
 	  <input type="radio" id="normal2" name="distribution2" value="normal2" onclick="distributionCheck2()">
 	  <label for="other">Normal</label>
-	  <label id="det-time-label2"  style="display:none">Processing time: </label><input type="number" id="det-time2" min="0" style="display:none" /><br id="det-time2br" style="display:none"/>
-	<label id="exp-mean-time-label2" style="display:none">Mean setup time:</label> <input type="number" id="exp-mean-time2" min="0" style="display:none" /><br id="exp-mean-time2br" style="display:none"/>
-	<label id="norm-mean-time-label2" style="display:none">Mean setup time: </label><input type="number" id="norm-mean-time2" min="0" style="display:none" /><br id="norm-mean-time2br" style="display:none"/>
-	<label id="norm-sd-label2" style="display:none">Standard deviation: </label><input type="number" id="norm-sd2" min="0" style="display:none" /><br id="norm-sd2br" style="display:none"/>
+	  <label id="det-time-label2"  style="display:none">Processing time: </label><input type="number" id="det-time2" min="0" style="display:none" />
+	<label id="exp-mean-time-label2" style="display:none">Mean setup time:</label> <input type="number" id="exp-mean-time2" min="0" style="display:none" />
+	<label id="norm-mean-time-label2" style="display:none">Mean setup time: </label><input type="number" id="norm-mean-time2" min="0" style="display:none" />
+	<label id="norm-sd-label2" style="display:none">Standard deviation: </label><input type="number" id="norm-sd2" min="0" style="display:none" />
 	
-	<button id="submitWSInfo">Add</button>
+	<button id="submitWSInfo"  style="display: block;">Add</button>
   </div>
 
 </div>
@@ -137,6 +160,7 @@
     <hr />
     Number of columns: <input type="number" id="processNumCols" min="1" max="10" /><br />
     Number of rows: <input type="number" id="processNumRows" min="1" max="10" /><br />
+    Number of weeks: <input type="number" id="processWeeks" min="1" max="10" /><br />
     Fixed Weekly Expenditure: <input type="number" id="fixedExp" min="1" /><br />
     Initial cash: <input type="number" id="initCash" min="1" /><br />
     <button id="submitProcessParams">Create</button>
@@ -334,10 +358,12 @@
 		}
 fixedExpValue=0;
 initCashValue=0;
+noOfWeeks=0;
 		var submitProcessParams = document.getElementById("submitProcessParams");
 		submitProcessParams.onclick= function(event) {
 			var cols=document.getElementById("processNumCols").value/1;
 			var rows = document.getElementById("processNumRows").value/1;
+			noOfWeeks=document.getElementById("processWeeks").value/1;
 			fixedExpValue=document.getElementById("fixedExp").value/1;
 			initCashValue=document.getElementById("initCash").value/1;
 			createProcessModal.style.display = "none";

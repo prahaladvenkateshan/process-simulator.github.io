@@ -349,7 +349,8 @@ exportProcess = function(fileName) {
 		metadata: {
 			fileName: fileName,
 			fixedExp: fixedExpValue,
-			initCash: initCashValue
+			initCash: initCashValue,
+			weeks: noOfWeeks
 		},
 		resourceInfo: tentativeResourceList,
 		processInfo:tentativeGraph,

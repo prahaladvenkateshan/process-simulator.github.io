@@ -16,6 +16,25 @@
     <title>Process Simulator (Working Copy)</title>
     <style>
 
+    	button {
+	  background-color: #e7e7e7; color: black;
+	  border: 1px solid black;
+	  padding: 5px;
+	  text-align: center;
+	  text-decoration: none;
+	  display: inline-block;
+	  font-size: 14px;
+	}
+
+	button {
+  transition-duration: 0.4s;
+}
+
+button:hover {
+  background-color: white; /* Green */
+  color: black;
+}
+
     	tr:nth-child(even) {background-color: #f2f2f2;}
     	th, td {
 		  border-bottom: 1px solid #ddd;
@@ -59,7 +78,13 @@
 		  border: 1px solid #888;
 		  width: 80%; /* Could be more or less, depending on screen size */
 		}
-
+		.modal-content input {
+			margin: 5px;
+		}
+		
+		.small {
+			width: 40% !important;
+		}
 		/* The Close Button */
 		.close {
 		  color: #aaa;
@@ -199,7 +224,7 @@
 <div id="rmPurchaseModal" class="modal">
 
   <!-- Modal content -->
-  <div class="modal-content">
+  <div class="modal-content small">
     <span class="close" id="close6">&times;</span>
     <h2>Purchase raw material </h2>
     <hr />
@@ -214,7 +239,7 @@
 <div id="wsParamsModal" class="modal">
 
   <!-- Modal content -->
-  <div class="modal-content">
+  <div class="modal-content small">
     <span class="close" id="close7">&times;</span>
     <h2>Set Task Properties</h2>
     <hr />

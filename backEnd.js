@@ -569,7 +569,7 @@ schedulerResBtn.onclick = function() {
 }
 
 
-
+noOfWeeks=0;
 metadataParser = function(metadataObj) {
 	//populate time data
 	layer.add(globalTimeKeeperObj.hr);
@@ -589,6 +589,7 @@ metadataParser = function(metadataObj) {
 	layer.add(globalFinanceObj.fixedExpDescriber);
 	stage.add(layer);
 	fixedExp=metadataObj.fixedExp;
+	noOfWeeks=metadataObj.weeks;
 	var text = layer.find('#fixedExp')[0];
 	text.setAttr('text',''+fixedExp);
 	currCash=metadataObj.initCash;
