@@ -41,9 +41,18 @@ actionStack=[];
             		tentativeGraph[temp.x][row+1-temp.y]=new Node(0,0,0,0,[],true,false);
             		removeDemand(temp.x,temp.y,temp.id);
             	} else if (temp.code=='ws-select-1'){
-
-            	} else if (temp.code=='ws-select-1'){
-
+            		oneWSselectedFlag=0;
+            		var shape = stage.find('#grid-'+connectX1+'-'+connectY1)[0];
+					shape.attrs.fill="white";
+					layer.draw();
+            	} else if (temp.code=='ws-select-2'){
+            		tentativeArrowList.pop();
+            		oneWSselectedFlag=1;
+            		var shape = stage.find('#grid-'+connectX1+'-'+connectY1)[0];
+					shape.attrs.fill="yellow";
+					var shape = stage.find('#Arrow'+temp.id)[0];
+					shape.remove();
+					layer.draw();
             	}
             }
         }
@@ -220,6 +229,10 @@ wsTrigger2 = function(x,y) {
 			connectX1=x;
 			connectY1=y;
 			console.log("connect 1 coords:"+x+","+y);
+			
+			var shape = stage.find('#grid-'+x+'-'+y)[0];
+			shape.attrs.fill="yellow";
+			layer.draw();
 			actionStack.push({code:'ws-select-1',x:x,y:y});
 			return;
 		}
@@ -230,7 +243,11 @@ wsTrigger2 = function(x,y) {
 			if(connectY2>connectY1) {return;}
 			console.log("connect 2 coords:"+x+","+y);
 			connectWorkstations(connectX1,connectY1,connectX2,connectY2);
-			actionStack.push({code:'ws-select-2',x:x,y:y});
+			var yyy=row+1-connectY1;
+			var shape = stage.find('#grid-'+connectX1+'-'+connectY1)[0];
+			shape.attrs.fill="white";
+			layer.draw();
+			
 			return;
 		}
 	}
@@ -292,7 +309,7 @@ connectWorkstations = function (x1,y1,x2,y2) {
 	}
 	t.insertArrow();
 	tentativeGraph[x2][row+1-y2].childNodes.push([x1,row+1-y1]);
-
+	actionStack.push({code:'ws-select-2',x:x2,y:y2,id:ArrowCounter});
 	console.log(tentativeGraph[x2][row+1-y2]);
 }
 
