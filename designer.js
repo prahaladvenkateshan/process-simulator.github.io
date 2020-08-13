@@ -14,6 +14,42 @@
 designGridObjs=[];
 definedFlag=[];
 
+actionStack=[];
+//action code
+ function KeyPress(e) {
+            var evtobj = window.event? event : e
+
+
+            //test1 if (evtobj.ctrlKey) alert("Ctrl");
+            //test2 if (evtobj.keyCode == 122) alert("z");
+            //test 1 & 2
+            if (evtobj.keyCode == 90 && evtobj.ctrlKey) {
+            	//undo from actionStack
+            	var temp=actionStack.pop();
+            	if(temp.code=='ws-add'){
+            		definedFlag[temp.x][temp.y]=0;
+            		tentativeGraph[temp.x][row+1-temp.y]=new Node(0,0,0,0,[],true,false);
+            		removeWS(temp.x,temp.y);
+            		removeBuffer(temp.x,temp.y);
+
+            	} else if(temp.code=='rm-add'){
+            		definedFlag[temp.x][temp.y]=0;
+            		tentativeGraph[temp.x][row+1-temp.y]=new Node(0,0,0,0,[],true,false);
+            		removeRM(temp.x,temp.y,temp.id);
+            	} else if (temp.code=='dm-add'){
+            		definedFlag[temp.x][temp.y]=0;
+            		tentativeGraph[temp.x][row+1-temp.y]=new Node(0,0,0,0,[],true,false);
+            		removeDemand(temp.x,temp.y,temp.id);
+            	} else if (temp.code=='ws-select-1'){
+
+            	} else if (temp.code=='ws-select-1'){
+
+            	}
+            }
+        }
+
+        document.onkeyup = KeyPress;
+
 //for resources
 var xCoord2=200;
 var yCoord2=50;
@@ -184,6 +220,7 @@ wsTrigger2 = function(x,y) {
 			connectX1=x;
 			connectY1=y;
 			console.log("connect 1 coords:"+x+","+y);
+			actionStack.push({code:'ws-select-1',x:x,y:y});
 			return;
 		}
 		if(oneWSselectedFlag==1) {
@@ -193,6 +230,7 @@ wsTrigger2 = function(x,y) {
 			if(connectY2>connectY1) {return;}
 			console.log("connect 2 coords:"+x+","+y);
 			connectWorkstations(connectX1,connectY1,connectX2,connectY2);
+			actionStack.push({code:'ws-select-2',x:x,y:y});
 			return;
 		}
 	}
@@ -230,7 +268,8 @@ addWorkstation = function (x,y,type,procConfig,buffervalue) {
 	tentativeGraph[x][row+1-y].breakdown=false;
 	tentativeGraph[x][row+1-y].timeSinceRepair=0;
 	tentativeGraph[x][row+1-y].numBreakdowns=0;
-	console.log(tentativeGraph[x][row+1-y])
+	console.log(tentativeGraph[x][row+1-y]);
+	actionStack.push({code:'ws-add',x:x,y:y});
 }
 tentativeArrowList=[];
 connectWorkstations = function (x1,y1,x2,y2) {
@@ -295,7 +334,8 @@ addRawMaterialNode = function(x,y,props) {
 	tentativeGraph[x][row+1-y].cost=props.cost;
 	if(definedFlag[x][y+1]==1){tentativeGraph[x][row+1-y].childNodes.push([x,row+1-y-1]);}
 	if(definedFlag[x][y-1]==1){tentativeGraph[x][row+1-y+1].childNodes.push([x,row+1-y]);}
-	console.log(tentativeGraph[x][row+1-y])
+	console.log(tentativeGraph[x][row+1-y]);
+	actionStack.push({code:'rm-add',x:x,y:y,id: RMCounter});
 }
 
 
@@ -340,6 +380,7 @@ addDemandNode = function(x,y,props) {
 	if(definedFlag[x][y+1]==1){tentativeGraph[x][row+1-y].childNodes.push([x,row+1-y-1]);}
 	if(definedFlag[x][y-1]==1){tentativeGraph[x][row+1-y+1].childNodes.push([x,row+1-y]);}
 	console.log(tentativeGraph[x][row+1-y]);
+	actionStack.push({code:'dm-add',x:x,y:y,id:DemandCounter});
 }
 
 

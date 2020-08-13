@@ -72,7 +72,8 @@ var DemandComp= new Konva.Ellipse({
     radiusY: 15,
     fill: 'white',
     stroke: 'black',
-    strokeWidth: 2
+    strokeWidth: 2,
+    id:'Demand'+Demandid
  });
 this.insertDemand = function()  {
 	layer.add(DemandComp);
@@ -114,7 +115,8 @@ var RMComp= new Konva.Ellipse({
     radiusY: 15,
     fill: 'white',
     stroke: 'black',
-    strokeWidth: 2
+    strokeWidth: 2,
+    id: 'RM'+RMid
  });
 this.insertRM = function()  {
 	layer.add(RMComp);
@@ -276,6 +278,38 @@ WS = function(x,y,fillColor,distrib,mean,sd,pos_x,pos_y,prevArray,nextArray){
     	text.setAttr('text', newText);
     	layer.draw();
     }
+}
+
+removeWS = function(x,y){
+    var shape = stage.find('#WS'+x+'-'+y)[0];
+    var text= stage.find('#WSText'+x+'-'+y)[0];
+    shape.remove();
+    text.remove();
+    layer.draw();
+}
+
+removeBuffer = function(x,y){
+    var shape = stage.find('#Buffer'+x+'-'+y)[0];
+    var text= stage.find('#BufferText'+x+'-'+y)[0];
+    shape.remove();
+    text.remove();
+    layer.draw();
+}
+
+removeRM = function(x,y,id){
+    var shape = stage.find('#RM'+id)[0];
+    var text= stage.find('#RMText'+id)[0];
+    shape.remove();
+    text.remove();
+    layer.draw();
+}
+
+removeDemand = function(x,y,id){
+    var shape = stage.find('#Demand'+id)[0];
+    var text= stage.find('#DemandText'+id)[0];
+    shape.remove();
+    text.remove();
+    layer.draw();
 }
 
 Buffer = function(x,y,pos_x,pos_y,prevArray,nextArray){
