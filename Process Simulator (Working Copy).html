@@ -12,6 +12,7 @@
     <script src="schedule.js"></script>
     <script src="activityLog.js"></script>
     <script src="loadSim.js"></script>
+    <script src="simulationBriefGenerator.js"></script>
     <meta charset="utf-8" />
     <meta name="author" content="Yuvraj Singh Bawa, Puneet Randar">
     <title>Process Simulator (Working Copy)</title>
@@ -105,13 +106,14 @@ button:hover {
   <body>
   	
   	<button id="load">Load</button>
-	<button id="import">Import</button>
-	<button id="runSimulation">Run</button>
-	<button id="paceDown">-</button>
-	<button id="paceUp">+</button>
-	<button id="pauseSimulation">Pause</button>
-	<button id="triggerScheduler">Schedule</button>
-	<button id="exportActivityLog">Export Activity Log</button>
+	<!--<button id="import">Import</button>-->
+	<button id="view" disabled>Info</button>
+	<button id="runSimulation" disabled>Run</button>
+	<button id="paceDown" disabled>-</button>
+	<button id="paceUp" disabled>+</button>
+	<button id="pauseSimulation" disabled>Pause</button>
+	<button id="triggerScheduler" disabled>Schedule</button>
+	<button id="exportActivityLog" disabled>Export Activity Log</button>
   	<!-- <input type="text" placeholder="Name..." id="fileName" />
   	<button id="myBtn">Add resource</button>
   	<button id="myBtn2">Create process</button>
@@ -355,7 +357,9 @@ button:hover {
   </div>
 
 </div>
-
+<form id="TheForm" method="post" action="https://process-simulator.github.io/generate-brief.html" target="TheWindow">
+<input type="hidden" name="something" value="something" />
+</form>
 <script>
 	
 	
@@ -410,6 +414,10 @@ button:hover {
 
 		document.getElementById("load").onclick = function(){
 			loadModal.style.display="block";
+		}
+		document.getElementById("view").onclick= function(){
+			  var win = window.open("", "Title", "toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=780,height=200,top="+(screen.height-400)+",left="+(screen.width-840));
+win.document.write(generateInfoSnippet());
 		}
 		// Get the button that opens the modal
 		// var btn = document.getElementById("myBtn");//addResourceModal
@@ -595,11 +603,26 @@ button:hover {
 				loadExistingSimulation(value);
 				loadModal.style.display="none";
 				document.getElementById("loadModalContent").innerHTML="<h2>Load simulation file</h2><hr />To load a new simulation, please refresh the page. <br/> <b>Warning!</b> You will lose all progress in the current simulation if you do so.";
+				document.getElementById("view").disabled=false;
+	document.getElementById("runSimulation").disabled=false;
+	document.getElementById("paceDown").disabled=false;
+	document.getElementById("paceUp").disabled=false;
+	document.getElementById("pauseSimulation").disabled=false;
+	document.getElementById("triggerScheduler").disabled=false;
+	document.getElementById("exportActivityLog").disabled=false;
 				return;
 			} else if (document.getElementById("uploadSelected").checked){
 				importFile();
 				loadModal.style.display="none";
 				document.getElementById("loadModalContent").innerHTML="<h2>Load simulation file</h2><hr />To load a new simulation, please refresh the page. <br/> <b>Warning!</b> You will lose all progress in the current simulation if you do so.";
+				document.getElementById("view").disabled=false;
+	document.getElementById("runSimulation").disabled=false;
+	document.getElementById("paceDown").disabled=false;
+	document.getElementById("paceUp").disabled=false;
+	document.getElementById("pauseSimulation").disabled=false;
+	document.getElementById("triggerScheduler").disabled=false;
+	document.getElementById("exportActivityLog").disabled=false;
+	return;
 			} else {
 				alert("Select an option!");
 				return;
