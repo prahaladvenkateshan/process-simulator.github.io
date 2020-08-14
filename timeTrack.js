@@ -134,7 +134,7 @@ incrementWeekCounter = function() {
 	clearInterval(simulationInterval);
 	clearInterval(frontendInterval);
 	triggerEndOfWeekFinancialsDialog();
-	if(globalTimeKeeper.week==3) {//probably 
+	if(globalTimeKeeper.week==noOfWeeks+1) {
 		alert("simulation over!"); clearInterval(simulationInterval); clearInterval(frontendInterval); return;} else {
 			triggerEndOfWeekFinancialsDialog();
 		}

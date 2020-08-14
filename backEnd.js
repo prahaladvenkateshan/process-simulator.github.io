@@ -379,6 +379,9 @@ rmPurchaseInitiate = function(id) {
 	var y= id.split('-')[2];
 	currRMPurchasey=y;
 	currRMPurchasex=x;
+
+	document.getElementById("totalCost").innerHTML="";
+	document.getElementById("unitsToBePurchased").value=0;
 	rmPurchaseModal.style.display="block";
 }
 
