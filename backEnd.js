@@ -270,7 +270,7 @@ var graphParser = function(processGraphMatrix) {
 					processFEObjs[i][j].insertWS();
 					processFEBuffers[i][j].insertBuffer();
 					processFEObjs[i][j].updateWSText(""+processGraphMatrix[i][j].displayProcTime);
-					processFEBuffers[i][j].updateBufferText(processGraphMatrix[i][j].units);
+					processFEBuffers[i][j].updateBufferText(""+processGraphMatrix[i][j].units);
 					// processFEObjAuras[i].push(new Konva.Rect({
 					// 	i: i,
 					// 	j: j,
