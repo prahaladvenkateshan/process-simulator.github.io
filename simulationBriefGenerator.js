@@ -22,7 +22,7 @@ for (var i=0;i<masterJSON.resourceInfo.length;i++){
 	if(masterJSON.resourceInfo[i].setupTimeConfig.code==0){
 		distrib="Deterministic";
 		temp2=""+masterJSON.resourceInfo[i].setupTimeConfig.time;
-	} else if (masterJSON.resourceInfo[i].setupTimeConfig.code==1){
+	} else if (masterJSON.resourceInfo[i].setupTimeConfig.code==2){
 		distrib="Exponential";
 		temp2=""+masterJSON.resourceInfo[i].setupTimeConfig.mean+"(avg.)";
 	} else {
@@ -41,7 +41,7 @@ for (var i=0;i<processGraph.length;i++){
 		if(processGraph[i][j].procConfig.code==0){
 			distrib="Deterministic";
 			temp2=""+processGraph[i][j].procConfig.time;
-		} else if (processGraph[i][j].procConfig.code==1){
+		} else if (processGraph[i][j].procConfig.code==2){
 			distrib="Exponential";
 			temp2=""+processGraph[i][j].procConfig.mean+"(avg.)";
 		} else {
