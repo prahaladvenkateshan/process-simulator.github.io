@@ -634,8 +634,8 @@ checkWhichBox= function(position,type) {
 		var xx=((position.x-xCoord1+20)/80).toFixed()/1;
 		var oldX=type.attrs.assignedToX;
 		var oldY=type.attrs.assignedToY;
-
-		if(processGraph[xx][yy].type==type.attrs.type){
+		console.log(processGraph[xx][yy].type,type.attrs.type)
+		if(processGraph[xx][yy].type==type.attrs.type && processGraph[xx][yy].isDummy ==false ){
 			assignResourceToTask(type,oldX,oldY,xx,yy);
 			// type.setAttr('opacity', 0);
 	  //       type.setAttr('x', type.attrs.original_x);
@@ -669,6 +669,13 @@ checkWhichBox= function(position,type) {
 	        type.setAttr('height', 50);
 	        layer.draw();
 		}
+	} else {
+		type.setAttr('opacity', 0);
+	        type.setAttr('x', type.attrs.original_x);
+	        type.setAttr('y', type.attrs.original_y);
+	        type.setAttr('width', 50);
+	        type.setAttr('height', 50);
+	        layer.draw();
 	}
 }
 
