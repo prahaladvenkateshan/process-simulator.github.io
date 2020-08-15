@@ -273,6 +273,7 @@ addWorkstation = function (x,y,type,procConfig,buffervalue) {
 	else t1.updateWSText(procConfig.mean);
 	var t2= new Buffer(xCoord1+80*x+20,yy+50,x,y,[],[]);
 	t2.insertBuffer();
+	t2.updateBufferText(""+buffervalue);
 	tentativeGraph[x][row+1-y].isDummy=false;
 	tentativeGraph[x][row+1-y].type=type;
 	tentativeGraph[x][row+1-y].units=""+buffervalue;
