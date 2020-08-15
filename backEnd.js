@@ -422,6 +422,8 @@ resourceParser = function(resourceArray) {
 		}
 	}
 }
+
+
 	var code=0;
 	var timeDisplay;
 	var temp= new Konva.Text({
@@ -482,6 +484,27 @@ resourceParser = function(resourceArray) {
 		});
 		layer.add(temp2);
 		stage.add(layer);
+	}
+	for(var i=0;i<len1*len2;i++){
+		document.getElementById('schedulerResNum').remove(0);
+		document.getElementById('schedulerTask').remove(0);
+	}
+	var k=document.getElementById('schedulerResType').value/1;
+	for(var i=0;i<masterJSON.resourceInfo[k].num;i++){
+		var opt = document.createElement('option');
+		opt.value = i;
+		opt.innerHTML = i;
+		document.getElementById('schedulerResNum').appendChild(opt);
+	}
+	for(var i=0;i<len1;i++){
+		for (var j=1;j<len2-1;j++){
+			if(processGraph[i][j].type==k&&processGraph[i][j].isDummy==false){
+				var opt = document.createElement('option');
+				opt.value = i+'-'+j;
+				opt.innerHTML = String.fromCharCode(65+i)+''+j;
+				document.getElementById('schedulerTask').appendChild(opt);
+			}
+		}
 	}
 	schedulerRMBtn=document.getElementById('schedulerAddPurchasingSchedule');
 

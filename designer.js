@@ -331,6 +331,9 @@ rmTrigger2 = function (x,y) {
 		connectX1=x;
 		connectY1=y;
 		console.log("connect 1 coords:"+x+","+y);
+		var shape = stage.find('#grid-'+connectX1+'-'+connectY1)[0];
+		shape.attrs.fill="yellow";
+		layer.draw();
 		return;
 	}
 }
@@ -374,6 +377,9 @@ demandTrigger2 = function (x,y) {
 		connectX2=x;
 		connectY2=y;
 		console.log("connect 2 coords:"+x+","+y);
+		var shape = stage.find('#grid-'+connectX1+'-'+connectY1)[0];
+		shape.attrs.fill="white";
+		layer.draw();
 		connectWorkstations(connectX1,connectY1,connectX2,connectY2);
 		return;
 	}
