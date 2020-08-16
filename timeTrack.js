@@ -135,8 +135,14 @@ incrementWeekCounter = function() {
 	clearInterval(frontendInterval);
 	
 	if(globalTimeKeeper.week==noOfWeeks+1) {
-		alert("simulation over!"); clearInterval(simulationInterval); clearInterval(frontendInterval); triggerEndOfWeekFinancialsDialog(); return;} else {
+		alert("simulation over!");
+		document.getElementById("runSimulation").disabled=true; 
+		clearInterval(simulationInterval); clearInterval(frontendInterval); triggerEndOfWeekFinancialsDialog(); return;} else {
 			triggerEndOfWeekFinancialsDialog();
+			if(currCash<0){
+				alert("You are bankrupt! Simulation over.");
+				document.getElementById("runSimulation").disabled=true; 
+			}
 		} 
 	var text = layer.find('#globalTimeKeeperObjWeek')[0];
 	text.setAttr('text',''+globalTimeKeeper.week);
