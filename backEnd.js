@@ -121,9 +121,9 @@ function runMode (){
 		}
 	}
 	//}
-	for (var i=0;i<len1;i++) {
-		for (var j=0; j<len2; j++) {
-			if(typeof processGraph[i][j].isDummy == 'undefined' || processGraph[i][j].isDummy==false){	
+	for (var q=0;q<__x.length;q++) {
+		var i=__x[q];
+		var j=__y[q];
 				if(j==len2-1) {
 					//demand stuff
 					if(processGraph[processGraph[i][j].childNodes[0][0]][processGraph[i][j].childNodes[0][1]].units>0) {
@@ -136,13 +136,15 @@ function runMode (){
 						processGraph[processGraph[i][j].childNodes[0][0]][processGraph[i][j].childNodes[0][1]].units-=1;
 					}
 					}
+					continue;
 				} else {
 					if(processGraph[i][j].status==3) {
 						//repairing
 						processGraph[i][j].timeSinceRepair+=1;
+						resourceUtilization[processGraph[i][j].type].repair+=1;
 						if(processGraph[i][j].timeSinceRepair>=processGraph[i][j].currRepairTime){
 							processGraph[i][j].status=2;
-							resourceObjs[processFEObjs[i][j].WSComp.attrs.resourceX][processFEObjs[i][j].WSComp.attrs.resourceY].updateResourceStatusText("prod");
+							resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
 							continue;
 						}
 					}
@@ -153,7 +155,7 @@ function runMode (){
 						resourceUtilization[processGraph[i][j].type].setup+=1;
 						if(processGraph[i][j].timeSinceSetup>=processGraph[i][j].setupTime || processGraph[i][j].setupTime==0){
 							processGraph[i][j].status=2; //mark it as running
-							resourceObjs[processFEObjs[i][j].WSComp.attrs.resourceX][processFEObjs[i][j].WSComp.attrs.resourceY].updateResourceStatusText("idle");
+							resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("idle");
 							processFEObjs[i][j].running();
 						}
 						continue;
@@ -178,16 +180,25 @@ function runMode (){
 									break;
 								}
 							}
+							if(canRun!=processGraph[i][j].canRun){
+								processGraph[i][j].canRun=canRun;
+								if(canRun==0){
+									resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("idle");
+								} else {
+									resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
+								}
+							}
 							if (canRun) {
 								processGraph[i][j].productionMode=true;
-								resourceObjs[processFEObjs[i][j].WSComp.attrs.resourceX][processFEObjs[i][j].WSComp.attrs.resourceY].updateResourceStatusText("prod");
+								
 								processGraph[i][j].timeSinceProduction=0;
 								for(var k=0;k<processGraph[i][j].childNodes.length;k++) {
 									processGraph[processGraph[i][j].childNodes[k][0]][processGraph[i][j].childNodes[k][1]].units-=1;
 								}
+								
 							} else {
 								processGraph[i][j].productionMode=false;
-								resourceObjs[processFEObjs[i][j].WSComp.attrs.resourceX][processFEObjs[i][j].WSComp.attrs.resourceY].updateResourceStatusText("idle");
+								
 							}
 						} else {
 								processGraph[i][j].timeSinceBreakdown+=1;
@@ -198,7 +209,7 @@ function runMode (){
 									processGraph[i][j].timeSinceRepair=0;
 									processGraph[i][j].timeSinceBreakdown=0;
 									console.log(processGraph[i][j].currBreakDownTime);
-									resourceObjs[processFEObjs[i][j].WSComp.attrs.resourceX][processFEObjs[i][j].WSComp.attrs.resourceY].updateResourceStatusText("repair");
+									resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("repair");
 								}
 								else {
 									processGraph[i][j].timeSinceProduction+=1;
@@ -222,11 +233,9 @@ function runMode (){
 				// 		//processFEObjs[i][j].updateRMText(""+processGraph[i][j].units);
 				// 	}
 				// } 
-			}
-		}
 	}
 
-
+var __x=[],__y=[];
 var processFEObjs=[]; //Process frontend Objects
 var processFEBuffers = [];
 var processFEObjAuras=[]; //transparent aura for interaction
@@ -240,6 +249,11 @@ var graphParser = function(processGraphMatrix) {
 		processFEObjAuras.push(new Array());
 		processFEBuffers.push(new Array());
 		for (var j=0; j<len2;j++) {
+			processGraph[i][j].canRun=0;
+			if(processGraph[i][j].isDummy==false){
+				__x.push(i);
+				__y.push(j);
+			}
 			processGraph[i][j].units=processGraph[i][j].units/1;
 			if(j==0){yy=0;} else if (j==len2-1){yy=yy=yMax} else {yy=30+50*j;}
 			if(j>0&&j<len2-1){
@@ -365,6 +379,7 @@ var graphParser = function(processGraphMatrix) {
 		        currWSBeingEditedx=xx;
 		        currWSBeingEditedy=yy;
 		        wsParamsModal.style.display="block";
+		        document.getElementById("limitUnits").focus()
 			}
 		}
 	});
@@ -383,6 +398,7 @@ rmPurchaseInitiate = function(id) {
 	document.getElementById("totalCost").innerHTML="";
 	document.getElementById("unitsToBePurchased").value=0;
 	rmPurchaseModal.style.display="block";
+	document.getElementById("unitsToBePurchased").focus();
 }
 
 arrowParser = function(arrowArray){
@@ -443,7 +459,7 @@ resourceParser = function(resourceArray) {
 		opt.innerHTML = resourceColourList[i];
 		document.getElementById('schedulerResType').appendChild(opt);
 
-		resourceUtilization.push({setup:0,prod:0,usedFlag:0});
+		resourceUtilization.push({setup:0,prod:0,repair:0,usedFlag:0});
 		resourceObjs.push(new Array());
 		resourceAuras.push(new Array());
 		code=resourceArray[i].setupTimeConfig.code;
@@ -702,6 +718,8 @@ assignResourceToTask = function (ResourceCompObject,x1,y1,x2,y2){
 	        resourceUtilization[processGraph[x2][y2].type].usedFlag=1;
 	        processFEObjs[x2][y2].WSComp.attrs.resourceX=ResourceCompObject.attrs.i;
 	        processFEObjs[x2][y2].WSComp.attrs.resourceY=ResourceCompObject.attrs.j;
+	        processFEObjs[x2][y2].resourceX=ResourceCompObject.attrs.i;
+	        processFEObjs[x2][y2].resourceY=ResourceCompObject.attrs.j;
 	        ResourceCompObject.setAttr('assignedToX', x2);
 	        ResourceCompObject.setAttr('assignedToY', y2);
 	        resourceObjs[ResourceCompObject.attrs.i][ResourceCompObject.attrs.j].updateResourceText(String.fromCharCode(65+x2)+y2);

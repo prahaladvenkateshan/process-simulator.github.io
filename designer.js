@@ -341,6 +341,7 @@ rmTrigger2 = function (x,y) {
 
 promptForRMInput = function () {
 	addRMModal.style.display = "block";
+	document.getElementById("costPerUnit").focus();
 }
 
 addRawMaterialNode = function(x,y,props) {
@@ -388,6 +389,7 @@ demandTrigger2 = function (x,y) {
 
 promptForDemandInput = function () {
 	addDemandModal.style.display = "block";
+	document.getElementById("unitsDemanded").focus();
 }
 addDemandNode = function(x,y,props) {
 	//props: units: units demanded

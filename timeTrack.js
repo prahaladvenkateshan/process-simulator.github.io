@@ -133,11 +133,11 @@ incrementWeekCounter = function() {
 	++globalTimeKeeper.week;
 	clearInterval(simulationInterval);
 	clearInterval(frontendInterval);
-	triggerEndOfWeekFinancialsDialog();
+	
 	if(globalTimeKeeper.week==noOfWeeks+1) {
-		alert("simulation over!"); clearInterval(simulationInterval); clearInterval(frontendInterval); return;} else {
+		alert("simulation over!"); clearInterval(simulationInterval); clearInterval(frontendInterval); triggerEndOfWeekFinancialsDialog(); return;} else {
 			triggerEndOfWeekFinancialsDialog();
-		}
+		} 
 	var text = layer.find('#globalTimeKeeperObjWeek')[0];
 	text.setAttr('text',''+globalTimeKeeper.week);
 	layer.draw();

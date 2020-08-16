@@ -66,8 +66,12 @@ updateCurrCashDisplay = function(){
 }
 
 triggerEndOfWeekFinancialsDialog = function(){
+console.log(currCash);
+		totSpending+=rmSpending;
 		totSpending+=fixedExp;
-		currCash-=fixedExp;
+		console.log(rmSpending,totSpending);
+		currCash=currCash-fixedExp;
+		updateCurrCashDisplay();
 		var endOfWeekCash=currCash;
 		var thisWeekThroughput=weekThroughput;
 		var RMinventoryValue=0;
@@ -81,12 +85,15 @@ triggerEndOfWeekFinancialsDialog = function(){
 		document.getElementById("sales").innerHTML=""+totalThroughput;
 		document.getElementById("RMinventoryValue").innerHTML=""+RMinventoryValue;
 		document.getElementById("OpEx").innerHTML=""+fixedExp;
-		document.getElementById("ROI").innerHTML=""+ROI+"%";
+		document.getElementById("ROI").innerHTML=""+ROI.toFixed(2)+"%";
 
 		//resource utilization compute:
-		var temp='<table class=\"disptable\"><tr><th>Resource</th><th>Setup</th><th>Prod</th></tr>';
+		var totalTimeElapsed=(globalTimeKeeper.week-1)*5*8*60
+		var tempTimeElapsed;
+		var temp='<table class=\"disptable\"><tr><th>Resource</th><th>Setup</th><th>Prod</th><th>Repair</th></tr>';
 		for(var i=0;i<resourceUtilization.length;i++){
-			temp+='<tr><td>'+resourceColourList[i]+"</td><td>"+resourceUtilization[i].setup+"</td><td>"+resourceUtilization[i].prod+"</td></tr>";
+			tempTimeElapsed=(masterJSON.resourceInfo[i].num/1)*totalTimeElapsed;
+			temp+='<tr><td>'+resourceColourList[i]+"</td><td>"+(100.0*resourceUtilization[i].setup/tempTimeElapsed).toFixed(2)+"%</td><td>"+(100.0*resourceUtilization[i].prod/tempTimeElapsed).toFixed(2)+"%</td><td>"+(100.0*resourceUtilization[i].repair/tempTimeElapsed).toFixed(2)+"%</td></tr>";
 		}
 		document.getElementById('ResourceUtilizationDiv').innerHTML=temp+'</table>';
 		EOWFinancialsModal.style.display="block";
