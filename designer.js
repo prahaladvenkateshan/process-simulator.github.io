@@ -182,7 +182,7 @@ designerInitiate = function (x,y,z) {
 		 	if(position.y<yCoord1+30){ yy = 0;}
 		 	else { yy=1+Math.trunc(((position.y-yCoord1-30)/50)/1);}
 			xx=Math.trunc(((position.x-xCoord1)/80)/1);
-			console.log(xx,yy);
+			//console.log(xx,yy);
 			if(yy>0&&yy<row+1&&xx<col){
 				//user has clicked on a workstation
 				wsTrigger2(xx,yy);
@@ -228,7 +228,7 @@ wsTrigger2 = function(x,y) {
 			oneWSselectedFlag=1;
 			connectX1=x;
 			connectY1=y;
-			console.log("connect 1 coords:"+x+","+y);
+			//console.log("connect 1 coords:"+x+","+y);
 			
 			var shape = stage.find('#grid-'+x+'-'+y)[0];
 			shape.attrs.fill="yellow";
@@ -240,8 +240,13 @@ wsTrigger2 = function(x,y) {
 			oneWSselectedFlag=0;
 			connectX2=x;
 			connectY2=y;
-			if(connectY2>connectY1) {return;}
-			console.log("connect 2 coords:"+x+","+y);
+			if(connectY2>connectY1) {
+				var shape = stage.find('#grid-'+connectX1+'-'+connectY1)[0];
+			shape.attrs.fill="white";
+			layer.draw();
+			return;
+		}
+			//console.log("connect 2 coords:"+x+","+y);
 			connectWorkstations(connectX1,connectY1,connectX2,connectY2);
 			var yyy=row+1-connectY1;
 			var shape = stage.find('#grid-'+connectX1+'-'+connectY1)[0];
@@ -286,7 +291,7 @@ addWorkstation = function (x,y,type,procConfig,buffervalue) {
 	tentativeGraph[x][row+1-y].breakdown=false;
 	tentativeGraph[x][row+1-y].timeSinceRepair=0;
 	tentativeGraph[x][row+1-y].numBreakdowns=0;
-	console.log(tentativeGraph[x][row+1-y]);
+	//console.log(tentativeGraph[x][row+1-y]);
 	actionStack.push({code:'ws-add',x:x,y:y});
 }
 tentativeArrowList=[];
@@ -311,7 +316,7 @@ connectWorkstations = function (x1,y1,x2,y2) {
 	t.insertArrow();
 	tentativeGraph[x2][row+1-y2].childNodes.push([x1,row+1-y1]);
 	actionStack.push({code:'ws-select-2',x:x2,y:y2,id:ArrowCounter});
-	console.log(tentativeGraph[x2][row+1-y2]);
+	//console.log(tentativeGraph[x2][row+1-y2]);
 }
 
 currRMx=0;
@@ -331,7 +336,7 @@ rmTrigger2 = function (x,y) {
 		oneWSselectedFlag=1;
 		connectX1=x;
 		connectY1=y;
-		console.log("connect 1 coords:"+x+","+y);
+		//console.log("connect 1 coords:"+x+","+y);
 		var shape = stage.find('#grid-'+connectX1+'-'+connectY1)[0];
 		shape.attrs.fill="yellow";
 		layer.draw();
@@ -356,7 +361,7 @@ addRawMaterialNode = function(x,y,props) {
 	tentativeGraph[x][row+1-y].cost=props.cost;
 	if(definedFlag[x][y+1]==1){tentativeGraph[x][row+1-y].childNodes.push([x,row+1-y-1]);}
 	if(definedFlag[x][y-1]==1){tentativeGraph[x][row+1-y+1].childNodes.push([x,row+1-y]);}
-	console.log(tentativeGraph[x][row+1-y]);
+	//console.log(tentativeGraph[x][row+1-y]);
 	actionStack.push({code:'rm-add',x:x,y:y,id: RMCounter});
 }
 
@@ -378,7 +383,7 @@ demandTrigger2 = function (x,y) {
 		oneWSselectedFlag=0;
 		connectX2=x;
 		connectY2=y;
-		console.log("connect 2 coords:"+x+","+y);
+		//console.log("connect 2 coords:"+x+","+y);
 		var shape = stage.find('#grid-'+connectX1+'-'+connectY1)[0];
 		shape.attrs.fill="white";
 		layer.draw();
@@ -405,7 +410,7 @@ addDemandNode = function(x,y,props) {
 	tentativeGraph[x][row+1-y].isDemand=true;
 	if(definedFlag[x][y+1]==1){tentativeGraph[x][row+1-y].childNodes.push([x,row+1-y-1]);}
 	if(definedFlag[x][y-1]==1){tentativeGraph[x][row+1-y+1].childNodes.push([x,row+1-y]);}
-	console.log(tentativeGraph[x][row+1-y]);
+	//console.log(tentativeGraph[x][row+1-y]);
 	actionStack.push({code:'dm-add',x:x,y:y,id:DemandCounter});
 }
 
