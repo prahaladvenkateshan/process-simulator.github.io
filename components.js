@@ -156,7 +156,7 @@ var ArrowComp = new Konva.Arrow({
     fill: 'black',
     stroke: 'black',
     strokeWidth: 2,
-    id: 'Arrow'+Arrowid
+    id: 'Arrow'+x1+'-'+y1+'-'+x2+'-'+y2+''
 });
 this.insertArrow = function()  {
 	layer.add(ArrowComp);
@@ -166,7 +166,7 @@ this.insertArrow = function()  {
 // 	alert("insert Arrow props");
 // })  ;
 this.updateArrow = function(x1,y1,x2,y2) {
-	var temp = layer.find('#Arrow'+Arrowid)[0];
+	var temp = layer.find('#Arrow'+x1+'-'+y1+'-'+x2+'-'+y2+'')[0];
 	var temp2=[x1,y1,x2,y2];
 	temp.setAttr('points',temp2);
 	layer.draw();

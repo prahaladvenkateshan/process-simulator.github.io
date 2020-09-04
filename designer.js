@@ -85,6 +85,7 @@ defineResourceType = function (setupTimeConfig, numResources) {
 	});
 	layer.add(temp3);
 	stage.add(layer);
+
 	}
 	//creates new resource type
 	if(currResourceTypeCount==7) { alert("can't create more than 7 types of resources!"); return;}
@@ -111,7 +112,57 @@ defineResourceType = function (setupTimeConfig, numResources) {
 	    //padding: 20,
 	    align: 'left'
 	});
+	var temp3= new Konva.Text({
+		x: xCoord2-150,
+	    y: yCoord2+17.5+100*(currResourceTypeCount-1),
+	    text:"[edit]",
+	    fontSize: 15,
+	    fontFamily: 'Arial',
+	    width: 50,
+	    //padding: 20,
+	    align: 'left',
+	    res_index:currResourceTypeCount
+	});
+	temp3.on('mouseenter', function () {
+        stage.container().style.cursor = 'pointer';
+      });
+	temp3.on('mouseleave', function () {
+        stage.container().style.cursor = 'default';
+      });
+	temp3.on('mouseup', function(){
+		//edit this particular resource
+		addResourceModal.style.display = "block";
+		editMode=true;
+		var res_index=this.attrs.res_index-1;
+		currResourceBeingEdited=res_index;
+		console.log(tentativeResourceList[res_index],tentativeResourceList[res_index].setupTimeConfig.code/1);
+		document.getElementById("numResourceInput").focus();
+		document.getElementById("numResourceInput").value=tentativeResourceList[res_index].num/1;
+		var code=tentativeResourceList[res_index].setupTimeConfig.code/1;
+		if(code==0){
+		 document.getElementById("deterministic").checked=true;
+		 distributionCheck();
+		 console.log(tentativeResourceList[res_index].setupTimeConfig.time);
+		 document.getElementById("det-time").value=tentativeResourceList[res_index].setupTimeConfig.time;
+		}
+		else if (code==1) {
+			document.getElementById("normal").checked=true;
+			distributionCheck();
+			document.getElementById("norm-mean-time").value=tentativeResourceList[res_index].setupTimeConfig.mean;
+			document.getElementById("norm-sd").value=tentativeResourceList[res_index].setupTimeConfig.sd;
+		}
+		else {
+			document.getElementById("exponential").checked=true;
+			distributionCheck();
+			document.getElementById("exp-mean-time").value=tentativeResourceList[res_index].setupTimeConfig.mean;
+		}
+
+		document.getElementById("mf").value=tentativeResourceList[res_index].setupTimeConfig.mf;
+		document.getElementById("mr").value=tentativeResourceList[res_index].setupTimeConfig.mr;
+		
+	});
 	layer.add(temp2);
+	layer.add(temp3);
 	stage.add(layer);
 
 	for (var i=0;i<numResources;i++) {
@@ -124,6 +175,41 @@ defineResourceType = function (setupTimeConfig, numResources) {
 			id: ''+currResourceTypeCount+'-'+i
 		});
 	}
+}
+currResourceBeingEdited=0;
+editResourceType = function(setupTimeConfig, numResources){
+	editMode=false;
+	if(tentativeResourceList[currResourceBeingEdited].num<numResources){
+		//add remaining
+		for (var i=tentativeResourceList[currResourceBeingEdited].num-1;i<numResources;i++) {
+		var temp= new Resource({
+			x:xCoord2+60*i,
+			y:yCoord2+100*(currResourceBeingEdited),
+			colour:resourceColourList[currResourceBeingEdited], 
+			stroke:'black',
+			setupTime:setupTimeConfig, 
+			id: ''+currResourceBeingEdited+'-'+i
+		});
+	}
+	} else if (tentativeResourceList[currResourceBeingEdited].num>numResources){
+		//remove extra
+		var delta=tentativeResourceList[currResourceBeingEdited].num-numResources;
+		console.log("delta:"+delta);
+		while (delta>0){
+			//console.log('#'+currResourceBeingEdited+'-'+(numResources+delta-1));
+			var objToBeRemoved= layer.find('#'+(currResourceBeingEdited+1)+'-'+(numResources+delta-1))[0];
+			var objToBeRemoved2= layer.find('#ResourceText'+(currResourceBeingEdited+1)+'-'+(numResources+delta-1))[0];
+			var objToBeRemoved3= layer.find('#ResourceStatusText'+(currResourceBeingEdited+1)+'-'+(numResources+delta-1))[0];
+			objToBeRemoved.remove();
+			objToBeRemoved2.remove();
+			objToBeRemoved3.remove();
+
+			delta-=1;
+		}
+		layer.draw();
+	}
+	tentativeResourceList[currResourceBeingEdited].num=numResources;
+	tentativeResourceList[currResourceBeingEdited].setupTimeConfig=setupTimeConfig;
 }
 row=0;
 col=0;
@@ -205,6 +291,7 @@ designerInitiate = function (x,y,z) {
 
 wsAddEnable=0;
 rmAddEnable=0;
+wsEditEnable=0;
 demandAddEnable=0;
 wsConnectEnable=0;
 oneWSselectedFlag=0;
@@ -219,8 +306,34 @@ tentativeGraph= [];
 currWSx=0;
 currWSy=0;
 wsTrigger2 = function(x,y) {
-	if(wsAddEnable==0&&wsConnectEnable==0) { return; }
-
+	if(wsAddEnable==0&&wsConnectEnable==0 && wsEditEnable==0) { return; }
+	if(wsEditEnable==1) {
+		if(definedFlag[x][y]==1){
+			addWorkstationModal.style.display = "block";
+			currWSx=x;
+			currWSy=y;
+			document.getElementById('ws-buffer2').value=tentativeGraph[x][row+1-y].units;
+			var code=tentativeGraph[x][row+1-y].procConfig.code;
+			if(code==0){
+			 document.getElementById("deterministic2").checked=true;
+			 distributionCheck2();
+			 //console.log(tentativeResourceList[res_index].setupTimeConfig.time);
+			 document.getElementById("det-time2").value=tentativeGraph[x][row+1-y].procConfig.time;
+			}
+			else if (code==1) {
+				document.getElementById("normal2").checked=true;
+				distributionCheck2();
+				document.getElementById("norm-mean-time2").value=tentativeGraph[x][row+1-y].procConfig.mean;
+				document.getElementById("norm-sd2").value=tentativeGraph[x][row+1-y].procConfig.sd;
+			}
+			else {
+				document.getElementById("exponential2").checked=true;
+				distributionCheck2();
+				document.getElementById("exp-mean-time2").value=tentativeGraph[x][row+1-y].procConfig.mean;
+			}
+		}
+		return;
+	}
 	
 	if(wsConnectEnable==1) {
 		if(definedFlag[x][y]==0){return;}
@@ -240,12 +353,14 @@ wsTrigger2 = function(x,y) {
 			oneWSselectedFlag=0;
 			connectX2=x;
 			connectY2=y;
-			if(connectY2>connectY1) {
+			if(connectY2>=connectY1) {
+				actionStack.pop();
 				var shape = stage.find('#grid-'+connectX1+'-'+connectY1)[0];
-			shape.attrs.fill="white";
-			layer.draw();
-			return;
-		}
+				shape.attrs.fill="white";
+				layer.draw();
+				oneWSselectedFlag=0;
+				return;
+			}
 			//console.log("connect 2 coords:"+x+","+y);
 			connectWorkstations(connectX1,connectY1,connectX2,connectY2);
 			var yyy=row+1-connectY1;
@@ -270,6 +385,11 @@ promptForWSInput = function () {
 
 addWorkstation = function (x,y,type,procConfig,buffervalue) {
 	definedFlag[x][y]=1;
+	if(wsEditEnable==1){
+		console.log(x,y);
+		removeWS(x,y);
+		removeBuffer(x,y);
+	}
 	var yy;
 	if(y==1){yy=30;} else if(y==0){yy=0;} else {yy=30+50*(y-1);}
 	var t1= new WS(xCoord1+80*x+40,yy+85,tentativeResourceList[type].colour,0,0,0,x,y,[],[]);
@@ -305,17 +425,17 @@ connectWorkstations = function (x1,y1,x2,y2) {
 	var t;
 	if(x1>x2 ) {
 		t=new Arrow(x1p,yy1,x2p+20,yy2+35);
-		tentativeArrowList.push([x1p,yy1,x2p+20,yy2+35]);
+		tentativeArrowList.push([x1p,yy1,x2p+20,yy2+35,x1,y1,x2,y2]);
 	}	else if(x1<x2) {
 		t=new Arrow(x1p,yy1,x2p-20,yy2+35);
-		tentativeArrowList.push([x1p,yy1,x2p-20,yy2+35]);
+		tentativeArrowList.push([x1p,yy1,x2p-20,yy2+35,x1,y1,x2,y2]);
 	}	else {
 		t=new Arrow(x1p,yy1,x2p,yy2+50);
-		tentativeArrowList.push([x1p,yy1,x2p,yy2+50]);
+		tentativeArrowList.push([x1p,yy1,x2p,yy2+50,x1,y1,x2,y2]);
 	}
 	t.insertArrow();
 	tentativeGraph[x2][row+1-y2].childNodes.push([x1,row+1-y1]);
-	actionStack.push({code:'ws-select-2',x:x2,y:y2,id:ArrowCounter});
+	actionStack.push({code:'ws-select-2',x:x2,y:y2,id:''+x1+'-'+y1+'-'+x2+'-'+y2+''});
 	//console.log(tentativeGraph[x2][row+1-y2]);
 }
 
@@ -416,6 +536,14 @@ addDemandNode = function(x,y,props) {
 
 
 exportProcess = function(fileName) {
+	for(var i=0;i<tentativeGraph.length;i++){
+		for(var j=1;j<tentativeGraph[i].length-1;j++){
+			if(tentativeGraph[i][j].isDummy==false && tentativeGraph[i][j].childNodes.length==0){
+				alert("Incomplete process flow!");
+				return;
+			}
+		}
+	}
 	//saves the process JSON
 	var processJSONObj={
 		metadata: {
@@ -435,4 +563,54 @@ exportProcess = function(fileName) {
     document.body.appendChild(downloadAnchorNode); // required for firefox
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
+}
+
+loadDesignerExisting = function(existingJSON) {
+	//first, set up resources
+	var resourcesArray= existingJSON.resourceInfo;
+	for(var i=0;i<resourcesArray.length;i++) {
+		defineResourceType( resourcesArray[i].setupTimeConfig, resourcesArray[i].num);
+	}
+
+	//import metadata
+	fixedExpValue=existingJSON.metadata.fixedExp/1;
+	initCashValue=existingJSON.metadata.initCash/1;
+	noOfWeeks=existingJSON.metadata.weeks;
+	//next, create process grid
+	var _cols= existingJSON.processInfo.length;
+	var _rows = existingJSON.processInfo[0].length-2;
+	designerInitiate(_cols,_cols,_rows);
+
+
+	//next, define workstations, RM nodes, and Demand nodes
+
+	//RM nodes
+
+	for(var i=0;i<existingJSON.processInfo.length;i++){
+		if(existingJSON.processInfo[i][0].isDummy==false) {
+			addRawMaterialNode(i, _rows+1,{cost:existingJSON.processInfo[i][0].cost});
+		}
+	}
+
+	//Demand nodes
+	for(var i=0;i<existingJSON.processInfo.length;i++){
+		if(existingJSON.processInfo[i][_rows+1].isDummy==false) {
+			addDemandNode(i, 0,{units:existingJSON.processInfo[i][_rows+1].units,sellingPrice:existingJSON.processInfo[i][_rows+1].sellingPrice});
+		}
+	}
+
+	//workstations
+	for(var i=0;i<existingJSON.processInfo.length;i++){
+		for (var j=1;j<_rows+1;j++){
+			if(existingJSON.processInfo[i][j].isDummy==false) {
+				addWorkstation(i,_rows+1-j,existingJSON.processInfo[i][j].type,existingJSON.processInfo[i][j].procConfig,existingJSON.processInfo[i][j].units);
+			}
+		}
+	}
+
+	//connect stuff!
+	for(var i=0;i<existingJSON.connectorInfo.length;i++){
+		connectWorkstations(existingJSON.connectorInfo[i][4],existingJSON.connectorInfo[i][5],existingJSON.connectorInfo[i][6],existingJSON.connectorInfo[i][7]);
+	}
+
 }
