@@ -56,12 +56,29 @@ globalFinanceObj={
 	    //padding: 20,
 	    align: 'left',
 	    id:'fixedExp'
+	}),
+	paceDisplay: new Konva.Text({
+		x: xCoordFinance,
+	   	y: yCoordFinance+20+30+20+20+30,
+	    text:"Pace: 1",
+	    fontSize: 15,
+	    fontFamily: 'Arial',
+	    width: 100,
+	    //padding: 20,
+	    align: 'left',
+	    id:'paceDisplay'
 	})
 }
 
 updateCurrCashDisplay = function(){
 	var text = layer.find('#currCash')[0];
 	text.setAttr('text',''+currCash);
+	layer.draw();
+}
+
+updatePaceDisplay = function() {
+	var text = layer.find('#paceDisplay')[0];
+	text.setAttr('text',"Pace: "+(1+currPace));
 	layer.draw();
 }
 

@@ -771,6 +771,7 @@ frontendInterval=0;
 				currPace-=1;
 				simulationInterval=setInterval(runMode,paces[currPace]);
 				frontendInterval=setInterval(FERefresh,FEpaces[currPace]);
+				updatePaceDisplay();
 			}
 		}
 
@@ -781,6 +782,7 @@ frontendInterval=0;
 				currPace+=1;
 				simulationInterval=setInterval(runMode,paces[currPace]);
 				frontendInterval=setInterval(FERefresh,FEpaces[currPace]);
+				updatePaceDisplay();
 			}
 		}
 		document.getElementById("exportActivityLog").onclick = function () {

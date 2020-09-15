@@ -629,6 +629,7 @@ metadataParser = function(metadataObj) {
 	layer.add(globalFinanceObj.cashDescriber);
 	layer.add(globalFinanceObj.fixedExp);
 	layer.add(globalFinanceObj.fixedExpDescriber);
+	layer.add(globalFinanceObj.paceDisplay);
 	stage.add(layer);
 	fixedExp=metadataObj.fixedExp;
 	noOfWeeks=metadataObj.weeks;
