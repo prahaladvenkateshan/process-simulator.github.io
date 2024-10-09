@@ -71,7 +71,7 @@ executeTask = function(task) {
 		var purchaseCost=(unitsToBePurchased*processGraph[RMx][RMy].cost);
 		if(purchaseCost>currCash) { alert("You don't have enough cash."); return;}
 		processGraph[RMx][RMy].units+=unitsToBePurchased;
-		processFEObjs[RMx][RMy].updateRMText(unitsToBePurchased);
+		processFEObjs[RMx][RMy].updateRMText(processGraph[RMx][RMy].units);
 		currCash-=purchaseCost;
 		rmSpending+=purchaseCost;
 		updateCurrCashDisplay();

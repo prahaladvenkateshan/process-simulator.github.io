@@ -87,7 +87,7 @@ computeTime = function (timeConfig) {
 }
 
 
-
+var counter=0;
 var len1=0;
 var len2= 0;
 function FERefresh () {
@@ -109,131 +109,136 @@ function FERefresh () {
 	}
 }
 
-function runMode (){
-	globalTimeKeeper.min+=1;
-	//if(Number.isInteger(globalTimeKeeper.min)){
-	incrementGlobalTimeKeeperMinutes();
-	if(thisHourScheduleList && thisHourScheduleList[globalTimeKeeper.min]){
-		var tasksToBePerformed=thisHourScheduleList[globalTimeKeeper.min];
-		for(var p=0;p<tasksToBePerformed.length;p++){
-			console.log(tasksToBePerformed[p]);
-			executeTask(tasksToBePerformed[p]);
+function runMode (steps){
+	if(!steps) steps =1;
+	for(walker=0;walker < steps; walker++){
+		//console.log("current minute: "+counter);counter++;
+		globalTimeKeeper.min+=1;
+		//if(Number.isInteger(globalTimeKeeper.min)){
+		incrementGlobalTimeKeeperMinutes();
+		if(thisHourScheduleList && thisHourScheduleList[globalTimeKeeper.min]){
+			var tasksToBePerformed=thisHourScheduleList[globalTimeKeeper.min];
+			for(var p=0;p<tasksToBePerformed.length;p++){
+				console.log(tasksToBePerformed[p]);
+				executeTask(tasksToBePerformed[p]);
+			}
 		}
-	}
-	//}
-	for (var q=0;q<__x.length;q++) {
-		var i=__x[q];
-		var j=__y[q];
-				if(j==len2-1) {
-					//demand stuff
-					if(processGraph[processGraph[i][j].childNodes[0][0]][processGraph[i][j].childNodes[0][1]].units>0) {
-						if(processGraph[i][j].units>0){
-							processGraph[i][j].units-=1;
-						//processFEObjs[i][j].updateDemandText(""+processGraph[i][j].units);
-						currCash+=processGraph[i][j].sellingPrice;
-						dayThroughput+=processGraph[i][j].sellingPrice;
-						//updateCurrCashDisplay();
-						processGraph[processGraph[i][j].childNodes[0][0]][processGraph[i][j].childNodes[0][1]].units-=1;
-					}
-					}
-					continue;
-				} else {
-					if(processGraph[i][j].status==3) {
-						//repairing
-						processGraph[i][j].timeSinceRepair+=1;
-						resourceUtilization[processGraph[i][j].type].repair+=1;
-						if(processGraph[i][j].timeSinceRepair>=processGraph[i][j].currRepairTime){
-							processGraph[i][j].status=2;
-							resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
-							continue;
+		//}
+		for (var q=0;q<__x.length;q++) {
+			var i=__x[q];
+			var j=__y[q];
+					if(j==len2-1) {
+						//demand stuff
+						if(processGraph[processGraph[i][j].childNodes[0][0]][processGraph[i][j].childNodes[0][1]].units>0) {
+							if(processGraph[i][j].units>0){
+								processGraph[i][j].units-=1;
+							//processFEObjs[i][j].updateDemandText(""+processGraph[i][j].units);
+							currCash+=processGraph[i][j].sellingPrice;
+							dayThroughput+=processGraph[i][j].sellingPrice;
+							//updateCurrCashDisplay();
+							processGraph[processGraph[i][j].childNodes[0][0]][processGraph[i][j].childNodes[0][1]].units-=1;
 						}
-					}
-					else if(processGraph[i][j].status==1){
-						//setting up
-						//processGraph[i][j].timeSinceSetup=(processGraph[i][j].timeSinceSetup+0.2).toFixed(1)/1;
-						processGraph[i][j].timeSinceSetup+=1;
-						resourceUtilization[processGraph[i][j].type].setup+=1;
-						if(processGraph[i][j].timeSinceSetup>=processGraph[i][j].setupTime || processGraph[i][j].setupTime==0){
-							processGraph[i][j].status=2; //mark it as running
-							resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("idle");
-							processFEObjs[i][j].running();
 						}
 						continue;
-					} else if (processGraph[i][j].status==2){
-						if(processGraph[i][j].productionMode==false) {
-							//check if it can run
-							var canRun=0;
-							for(var k=0;k<processGraph[i][j].childNodes.length;k++) {
-								if(processGraph[processGraph[i][j].childNodes[k][0]][processGraph[i][j].childNodes[k][1]].units>0){
-									if(processGraph[i][j].hasLimitSet==true){
-										if(processGraph[i][j].limit>0){
-											canRun=1;
-										} else {
-											canRun=0;
-										}
-									} else {
-										canRun=1;
-									} 
-								} else {
-									canRun=0; 
-
-									break;
-								}
+					} else {
+						if(processGraph[i][j].status==3) {
+							//repairing
+							processGraph[i][j].timeSinceRepair+=1;
+							resourceUtilization[processGraph[i][j].type].repair+=1;
+							if(processGraph[i][j].timeSinceRepair>=processGraph[i][j].currRepairTime){
+								processGraph[i][j].status=2;
+								resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
+								continue;
 							}
-							if(canRun!=processGraph[i][j].canRun){
-								processGraph[i][j].canRun=canRun;
-								if(canRun==0){
-									resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("idle");
-								} else {
-									resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
-								}
+						}
+						else if(processGraph[i][j].status==1){
+							//setting up
+							//processGraph[i][j].timeSinceSetup=(processGraph[i][j].timeSinceSetup+0.2).toFixed(1)/1;
+							processGraph[i][j].timeSinceSetup+=1;
+							resourceUtilization[processGraph[i][j].type].setup+=1;
+							if(processGraph[i][j].timeSinceSetup>=processGraph[i][j].setupTime || processGraph[i][j].setupTime==0){
+								processGraph[i][j].status=2; //mark it as running
+								resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("idle");
+								processFEObjs[i][j].running();
 							}
-							if (canRun) {
-								processGraph[i][j].productionMode=true;
-								
-								processGraph[i][j].timeSinceProduction=0;
+							continue;
+						} else if (processGraph[i][j].status==2){
+							if(processGraph[i][j].productionMode==false) {
+								//check if it can run
+								var canRun=0;
 								for(var k=0;k<processGraph[i][j].childNodes.length;k++) {
-									processGraph[processGraph[i][j].childNodes[k][0]][processGraph[i][j].childNodes[k][1]].units-=1;
+									if(processGraph[processGraph[i][j].childNodes[k][0]][processGraph[i][j].childNodes[k][1]].units>0){
+										if(processGraph[i][j].hasLimitSet==true){
+											if(processGraph[i][j].limit>0){
+												canRun=1;
+											} else {
+												canRun=0;
+											}
+										} else {
+											canRun=1;
+										} 
+									} else {
+										canRun=0; 
+
+										break;
+									}
 								}
-								
+								if(canRun!=processGraph[i][j].canRun){
+									processGraph[i][j].canRun=canRun;
+									if(canRun==0){
+										resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("idle");
+									} else {
+										resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
+									}
+								}
+								if (canRun) {
+									processGraph[i][j].productionMode=true;
+									
+									processGraph[i][j].timeSinceProduction=0;
+									for(var k=0;k<processGraph[i][j].childNodes.length;k++) {
+										processGraph[processGraph[i][j].childNodes[k][0]][processGraph[i][j].childNodes[k][1]].units-=1;
+									}
+									
+								} else {
+									processGraph[i][j].productionMode=false;
+									
+								}
 							} else {
-								processGraph[i][j].productionMode=false;
-								
-							}
-						} else {
-								processGraph[i][j].timeSinceBreakdown+=1;
-								if(processGraph[i][j].timeSinceBreakdown>=processGraph[i][j].currBreakDownTime){
-									processGraph[i][j].status=3;
-									processGraph[i][j].currBreakDownTime=((-1*processGraph[i][j].setupConfig.mf)*Math.log(1-Math.random())).toFixed()/1;
-									processGraph[i][j].currRepairTime=((-1*processGraph[i][j].setupConfig.mr)*Math.log(1-Math.random())).toFixed()/1;
-									processGraph[i][j].timeSinceRepair=0;
-									processGraph[i][j].timeSinceBreakdown=0;
-									console.log(processGraph[i][j].currBreakDownTime);
-									resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("repair");
-								}
-								else {
-									processGraph[i][j].timeSinceProduction+=1;
-									resourceUtilization[processGraph[i][j].type].prod+=1;
-									if (processGraph[i][j].timeSinceProduction>=processGraph[i][j].procTime) {
-										processGraph[i][j].units+=1;
-										if(processGraph[i][j].hasLimitSet){processGraph[i][j].limit-=1;}
-										processGraph[i][j].recomputeProcTime();
-										processGraph[i][j].timeSinceProduction=0;
-										processGraph[i][j].productionMode=false;
+									processGraph[i][j].timeSinceBreakdown+=1;
+									if(processGraph[i][j].timeSinceBreakdown>=processGraph[i][j].currBreakDownTime){
+										processGraph[i][j].status=3;
+										processGraph[i][j].currBreakDownTime=((-1*processGraph[i][j].setupConfig.mf)*Math.log(1-Math.random())).toFixed()/1;
+										processGraph[i][j].currRepairTime=((-1*processGraph[i][j].setupConfig.mr)*Math.log(1-Math.random())).toFixed()/1;
+										processGraph[i][j].timeSinceRepair=0;
+										processGraph[i][j].timeSinceBreakdown=0;
+										console.log(processGraph[i][j].currBreakDownTime);
+										resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("repair");
+									}
+									else {
+										processGraph[i][j].timeSinceProduction+=1;
+										resourceUtilization[processGraph[i][j].type].prod+=1;
+										if (processGraph[i][j].timeSinceProduction>=processGraph[i][j].procTime) {
+											processGraph[i][j].units+=1;
+											if(processGraph[i][j].hasLimitSet){processGraph[i][j].limit-=1;}
+											processGraph[i][j].recomputeProcTime();
+											processGraph[i][j].timeSinceProduction=0;
+											processGraph[i][j].productionMode=false;
+										}
 									}
 								}
 							}
 						}
-					}
-				}	
-				// if(processFEBuffers[i][j]!="dummy") {
-				// 	if(j!=0) {
-				// 		processFEBuffers[i][j].updateBufferText(""+processGraph[i][j].units);
-				// 	} else {
-				// 		//processFEObjs[i][j].updateRMText(""+processGraph[i][j].units);
-				// 	}
-				// } 
+					}	
+					// if(processFEBuffers[i][j]!="dummy") {
+					// 	if(j!=0) {
+					// 		processFEBuffers[i][j].updateBufferText(""+processGraph[i][j].units);
+					// 	} else {
+					// 		//processFEObjs[i][j].updateRMText(""+processGraph[i][j].units);
+					// 	}
+					// } 
 	}
+	FERefresh();
+}
 
 var __x=[],__y=[];
 var processFEObjs=[]; //Process frontend Objects
@@ -303,7 +308,6 @@ var graphParser = function(processGraphMatrix) {
 					// processFEObjAuras[i][j].on('mouseup', function(){
 	    //                    	if(wsEditable){
 				 //            clearInterval(simulationInterval);
-				 //            clearInterval(frontendInterval);
 				 //            currWSBeingEditedx=this.attrs.i;
 				 //            currWSBeingEditedy=this.attrs.j;
 				 //            wsParamsModal.style.display="block";
@@ -375,7 +379,8 @@ var graphParser = function(processGraphMatrix) {
 			var xx=((position.x-xCoord1+20)/80).toFixed()/1;
 	       	if(wsEditable&&processGraph[xx][yy].isDummy==false && yy!=0&&yy!=len2-1){
 		        clearInterval(simulationInterval);
-		        clearInterval(frontendInterval);
+				simulationInterval =0;
+				changeButtons(1);
 		        currWSBeingEditedx=xx;
 		        currWSBeingEditedy=yy;
 		        wsParamsModal.style.display="block";
@@ -385,11 +390,20 @@ var graphParser = function(processGraphMatrix) {
 	});
 }
 
+function changeButtons(key = 0){
+	//key =0 if strating simulation & key =1 if stopping simulation
+	hideElem = document.getElementById(key ? "pauseSimulation" : "runSimulation");
+	showElem = document.getElementById(!key ? "pauseSimulation" : "runSimulation");
+	hideElem.style.display = "none";
+	showElem.style.display = "inline-block";
+}
+
 currRMPurchasex=0;
 currRMPurchasey=0;
 rmPurchaseInitiate = function(id) {
 	clearInterval(simulationInterval);
-	clearInterval(frontendInterval);
+	simulationInterval =0;
+	changeButtons(1);
 	var x= id.split('-')[1];
 	var y= id.split('-')[2];
 	currRMPurchasey=y;
@@ -706,6 +720,7 @@ assignResourceToTask = function (ResourceCompObject,x1,y1,x2,y2){
 	        ResourceCompObject.setAttr('height', 50);
 	        layer.draw();
 	        if(x1>-1){
+				//picking resource from x1, y1
 	        	if(processGraph[x1][y1].productionMode==true){
 	        		for(var k=0;k<processGraph[x1][y1].childNodes.length;k++) {
 	        			processGraph[processGraph[x1][y1].childNodes[k][0]][processGraph[x1][y1].childNodes[k][1]].units+=1;
