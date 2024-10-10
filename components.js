@@ -199,6 +199,10 @@ WS = function(x,y,fillColor,distrib,mean,sd,pos_x,pos_y,prevArray,nextArray){
         var hmm=tempRunning.getAttr('fillColor');
         tempRunning.setAttr('fill',hmm);
     }
+    this.multipleMachines = function(){
+        var tempRunning = layer.find('#WS'+WSid)[0];
+        tempRunning.setAttr('fill',"#000000");
+    }
     var ctr1=0;
     for (ctr1=0;ctr1<nextArray.length;ctr1++){
         this.nextIDs.push(nextArray[ctr1]);

@@ -108,7 +108,9 @@ function FERefresh () {
 		}
 	}
 }
-
+function minimum(a,b){
+	if(a<b) return a; return b;
+}
 function runMode (steps){
 	if(!steps) steps =1;
 	for(walker=0;walker < steps; walker++){
@@ -127,102 +129,114 @@ function runMode (steps){
 		for (var q=0;q<__x.length;q++) {
 			var i=__x[q];
 			var j=__y[q];
+			let pg=processGraph[i][j];
 					if(j==len2-1) {
 						//demand stuff
-						if(processGraph[processGraph[i][j].childNodes[0][0]][processGraph[i][j].childNodes[0][1]].units>0) {
-							if(processGraph[i][j].units>0){
-								processGraph[i][j].units-=1;
-							//processFEObjs[i][j].updateDemandText(""+processGraph[i][j].units);
-							currCash+=processGraph[i][j].sellingPrice;
-							dayThroughput+=processGraph[i][j].sellingPrice;
+						if(processGraph[pg.childNodes[0][0]][pg.childNodes[0][1]].units>0) {
+							if(pg.units>0){
+								let sellQty = minimum(pg.units,processGraph[pg.childNodes[0][0]][pg.childNodes[0][1]].units)
+								pg.units-=sellQty;
+							//processFEObjs[i][j].updateDemandText(""+pg.units);
+							currCash+=(sellQty*pg.sellingPrice);
+							dayThroughput+=(sellQty*pg.sellingPrice);
 							//updateCurrCashDisplay();
-							processGraph[processGraph[i][j].childNodes[0][0]][processGraph[i][j].childNodes[0][1]].units-=1;
+							processGraph[pg.childNodes[0][0]][pg.childNodes[0][1]].units-=sellQty;
 						}
 						}
 						continue;
-					} else {
-						if(processGraph[i][j].status==3) {
-							//repairing
-							processGraph[i][j].timeSinceRepair+=1;
-							resourceUtilization[processGraph[i][j].type].repair+=1;
-							if(processGraph[i][j].timeSinceRepair>=processGraph[i][j].currRepairTime){
-								processGraph[i][j].status=2;
-								resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
-								continue;
-							}
-						}
-						else if(processGraph[i][j].status==1){
-							//setting up
-							//processGraph[i][j].timeSinceSetup=(processGraph[i][j].timeSinceSetup+0.2).toFixed(1)/1;
-							processGraph[i][j].timeSinceSetup+=1;
-							resourceUtilization[processGraph[i][j].type].setup+=1;
-							if(processGraph[i][j].timeSinceSetup>=processGraph[i][j].setupTime || processGraph[i][j].setupTime==0){
-								processGraph[i][j].status=2; //mark it as running
-								resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("idle");
-								processFEObjs[i][j].running();
-							}
-							continue;
-						} else if (processGraph[i][j].status==2){
-							if(processGraph[i][j].productionMode==false) {
-								//check if it can run
-								var canRun=0;
-								for(var k=0;k<processGraph[i][j].childNodes.length;k++) {
-									if(processGraph[processGraph[i][j].childNodes[k][0]][processGraph[i][j].childNodes[k][1]].units>0){
-										if(processGraph[i][j].hasLimitSet==true){
-											if(processGraph[i][j].limit>0){
-												canRun=1;
-											} else {
-												canRun=0;
-											}
-										} else {
-											canRun=1;
-										} 
-									} else {
-										canRun=0; 
-
-										break;
-									}
+					} else {		
+						for(let machine=0;machine<(1+(pg?.extraMachines?.length||0));machine++){
+							let pgNew = machine ? (pg?.extraMachines?.[machine-1]):pg; 
+							if(pgNew.status==3) {
+								//repairing
+								pgNew.timeSinceRepair+=1;
+								resourceUtilization[pgNew.type].repair+=1;
+								if(pgNew.timeSinceRepair>=pgNew.currRepairTime){
+									pgNew.status=2;
+									if(machine) resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX].updateResourceStatusText("prod");
+									else resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
+									continue;
 								}
-								if(canRun!=processGraph[i][j].canRun){
-									processGraph[i][j].canRun=canRun;
-									if(canRun==0){
+							}
+							else if(pgNew.status==1){
+								//setting up
+								//pgNew.timeSinceSetup=(pgNew.timeSinceSetup+0.2).toFixed(1)/1;
+								pgNew.timeSinceSetup+=1;
+								console.log(pgNew);
+								resourceUtilization[pg.type].setup+=1;
+								if(pgNew.timeSinceSetup>=pg.setupTime || pg.setupTime==0){
+									pgNew.status=2; //mark it as running
+									if(machine){
+										resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX].updateResourceStatusText("idle");
+									}
+									else{
 										resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("idle");
+										if(!pg?.extraMachines?.length) processFEObjs[i][j].running();
+									}
+								}
+								continue;
+							} else if (pgNew.status==2){
+								if(pgNew.productionMode==false) {
+									//check if it can run
+									var canRun=0;
+									for(var k=0;k<pg.childNodes.length;k++) {
+										if(processGraph[pg.childNodes[k][0]][pg.childNodes[k][1]].units>0){
+											if(pg.hasLimitSet==true){
+												if(pg.limit>0){
+													canRun=1;
+												} else {
+													canRun=0;
+												}
+											} else {
+												canRun=1;
+											} 
+										} else {
+											canRun=0; 
+
+											break;
+										}
+									}
+									if(canRun!=pgNew.canRun){
+										pgNew.canRun=canRun;
+										if(machine){
+											resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX].updateResourceStatusText(canRun ? "prod": "idle");
+										} else {
+											resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText(canRun ? "prod": "idle");
+										}
+									}
+									if (canRun) {
+										pgNew.productionMode=true;
+										pgNew.timeSinceProduction=0;
+										for(var k=0;k<pg.childNodes.length;k++) {
+											processGraph[pg.childNodes[k][0]][pg.childNodes[k][1]].units-=1;
+										}
+										
 									} else {
-										resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
+										pgNew.productionMode=false;
 									}
-								}
-								if (canRun) {
-									processGraph[i][j].productionMode=true;
-									
-									processGraph[i][j].timeSinceProduction=0;
-									for(var k=0;k<processGraph[i][j].childNodes.length;k++) {
-										processGraph[processGraph[i][j].childNodes[k][0]][processGraph[i][j].childNodes[k][1]].units-=1;
-									}
-									
 								} else {
-									processGraph[i][j].productionMode=false;
-									
-								}
-							} else {
-									processGraph[i][j].timeSinceBreakdown+=1;
-									if(processGraph[i][j].timeSinceBreakdown>=processGraph[i][j].currBreakDownTime){
-										processGraph[i][j].status=3;
-										processGraph[i][j].currBreakDownTime=((-1*processGraph[i][j].setupConfig.mf)*Math.log(1-Math.random())).toFixed()/1;
-										processGraph[i][j].currRepairTime=((-1*processGraph[i][j].setupConfig.mr)*Math.log(1-Math.random())).toFixed()/1;
-										processGraph[i][j].timeSinceRepair=0;
-										processGraph[i][j].timeSinceBreakdown=0;
-										console.log(processGraph[i][j].currBreakDownTime);
-										resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("repair");
-									}
-									else {
-										processGraph[i][j].timeSinceProduction+=1;
-										resourceUtilization[processGraph[i][j].type].prod+=1;
-										if (processGraph[i][j].timeSinceProduction>=processGraph[i][j].procTime) {
-											processGraph[i][j].units+=1;
-											if(processGraph[i][j].hasLimitSet){processGraph[i][j].limit-=1;}
-											processGraph[i][j].recomputeProcTime();
-											processGraph[i][j].timeSinceProduction=0;
-											processGraph[i][j].productionMode=false;
+										pgNew.timeSinceBreakdown+=1;
+										if(pgNew.timeSinceBreakdown>=pgNew.currBreakDownTime){
+											pgNew.status=3;
+											pgNew.currBreakDownTime=((-1*pg.setupConfig.mf)*Math.log(1-Math.random())).toFixed()/1;
+											pgNew.currRepairTime=((-1*pg.setupConfig.mr)*Math.log(1-Math.random())).toFixed()/1;
+											pgNew.timeSinceRepair=0;
+											pgNew.timeSinceBreakdown=0;
+											console.log(pgNew.currBreakDownTime);
+											
+											if(machine) resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX].updateResourceStatusText("repair");
+											else resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("repair");
+										}
+										else {
+											pgNew.timeSinceProduction+=1;
+											resourceUtilization[pg.type].prod+=1;
+											if (pgNew.timeSinceProduction>=pg.procTime) {
+												pg.units+=1;
+												if(pg.hasLimitSet){pg.limit-=1;}
+												pg.recomputeProcTime();
+												pgNew.timeSinceProduction=0;
+												pgNew.productionMode=false;
+											}
 										}
 									}
 								}
@@ -231,9 +245,9 @@ function runMode (steps){
 					}	
 					// if(processFEBuffers[i][j]!="dummy") {
 					// 	if(j!=0) {
-					// 		processFEBuffers[i][j].updateBufferText(""+processGraph[i][j].units);
+					// 		processFEBuffers[i][j].updateBufferText(""+pg.units);
 					// 	} else {
-					// 		//processFEObjs[i][j].updateRMText(""+processGraph[i][j].units);
+					// 		//processFEObjs[i][j].updateRMText(""+pg.units);
 					// 	}
 					// } 
 	}
@@ -713,6 +727,7 @@ checkWhichBox= function(position,type) {
 
 assignResourceToTask = function (ResourceCompObject,x1,y1,x2,y2){
 	//re-assigns a Resource from x1,y1 to x2,y2
+	console.log(ResourceCompObject);
 	ResourceCompObject.setAttr('opacity', 0);
 	        ResourceCompObject.setAttr('x', ResourceCompObject.attrs.original_x);
 	        ResourceCompObject.setAttr('y', ResourceCompObject.attrs.original_y);
@@ -721,21 +736,65 @@ assignResourceToTask = function (ResourceCompObject,x1,y1,x2,y2){
 	        layer.draw();
 	        if(x1>-1){
 				//picking resource from x1, y1
-	        	if(processGraph[x1][y1].productionMode==true){
-	        		for(var k=0;k<processGraph[x1][y1].childNodes.length;k++) {
-	        			processGraph[processGraph[x1][y1].childNodes[k][0]][processGraph[x1][y1].childNodes[k][1]].units+=1;
-	        		}
-	        	}
-	        	processGraph[x1][y1].status=0;
-	        	processFEObjs[x1][y1].notRunning();
+				let extraMachineArr = processGraph[x1][y1]?.extraMachines;
+				if(extraMachineArr?.length){
+					//extra machine getting removed
+					if(extraMachineArr[extraMachineArr?.length-1].productionMode==true){
+						for(var k=0;k<processGraph[x1][y1].childNodes.length;k++) {
+							processGraph[processGraph[x1][y1].childNodes[k][0]][processGraph[x1][y1].childNodes[k][1]].units+=1;
+						}
+					}
+					if(extraMachineArr?.length == 1) {
+						delete processGraph[x1][y1]['extraMachines'];
+						delete processFEObjs[x1][y1]['extraMachines'];
+						if(processGraph[x1][y1].status==2 || processGraph[x1][y1].status==3) processFEObjs[x1][y1].running();
+						else processFEObjs[x1][y1].notRunning();
+					}
+					else {
+						extraMachineArr.pop();
+						processFEObjs?.extraMachines?.pop();
+						processFEObjs[x1][y1].multipleMachines();
+					}
+				}
+	        	else {
+					if(processGraph[x1][y1].productionMode==true){
+						for(var k=0;k<processGraph[x1][y1].childNodes.length;k++) {
+							processGraph[processGraph[x1][y1].childNodes[k][0]][processGraph[x1][y1].childNodes[k][1]].units+=1;
+						}
+					}
+					processGraph[x1][y1].status=0;
+					processFEObjs[x1][y1].notRunning();
+				}
 	        }
-	        processGraph[x2][y2].status=1;
-	        if(processGraph[x2][y2].setupTime==0){processGraph[x2][y2].status=2;} else {  processGraph[x2][y2].recomputeSetupTime();}
-	        resourceUtilization[processGraph[x2][y2].type].usedFlag=1;
-	        processFEObjs[x2][y2].WSComp.attrs.resourceX=ResourceCompObject.attrs.i;
-	        processFEObjs[x2][y2].WSComp.attrs.resourceY=ResourceCompObject.attrs.j;
-	        processFEObjs[x2][y2].resourceX=ResourceCompObject.attrs.i;
-	        processFEObjs[x2][y2].resourceY=ResourceCompObject.attrs.j;
+			let pg=processGraph[x2][y2],newMachine=0;
+			if(pg.status) newMachine=1;
+			let pgNew= newMachine ? new Node(pg.type,0,pg.setupConfig,pg.procConfig,pg.children, pg.isDummy,pg.isDemand): pg; 
+	        pgNew.status=1;
+	        if(pg.setupTime==0){pgNew.status=2;} else {  pgNew.recomputeSetupTime();}
+	        resourceUtilization[pg.type].usedFlag=1;
+			if(newMachine){
+				if(pg?.extraMachines?.length) pg.extraMachines?.push(pgNew);
+				else pg['extraMachines'] = [pgNew];
+				processFEObjs[x2][y2].multipleMachines();
+				let newEntry = {
+					resourceX: ResourceCompObject.attrs.i,
+					resourceY: ResourceCompObject.attrs.j,
+					WSComp:		{
+									attrs:{
+										resourceX: ResourceCompObject.attrs.i,
+										resourceY: ResourceCompObject.attrs.j,
+									}
+								}
+				}
+				if(processFEObjs[x2][y2]?.extraMachines?.length) processFEObjs[x2][y2]?.extraMachines?.push(newEntry);
+				else processFEObjs[x2][y2]['extraMachines']=[newEntry];
+			}
+			else{
+				processFEObjs[x2][y2].WSComp.attrs.resourceX=ResourceCompObject.attrs.i;
+				processFEObjs[x2][y2].WSComp.attrs.resourceY=ResourceCompObject.attrs.j;
+				processFEObjs[x2][y2].resourceX=ResourceCompObject.attrs.i;
+				processFEObjs[x2][y2].resourceY=ResourceCompObject.attrs.j;
+			}
 	        ResourceCompObject.setAttr('assignedToX', x2);
 	        ResourceCompObject.setAttr('assignedToY', y2);
 	        resourceObjs[ResourceCompObject.attrs.i][ResourceCompObject.attrs.j].updateResourceText(String.fromCharCode(65+x2)+y2);
