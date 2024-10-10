@@ -760,7 +760,7 @@ changeButtons(1);
 		runSimulation.onclick = function() {
 			if(simulationInterval) return;
 			scheduleCheck();
-			simulationInterval= setInterval(()=>runMode(stepsArr[currPace]),stepCalculations(paces[currPace],stepsArr[currPace]));
+			simulationInterval= setInterval(()=>runMode(stepsArr[currPace]),paces[currPace]*stepsArr[currPace]);
 			changeButtons();
 		}
 		pauseSimulation.onclick = function() {
@@ -768,29 +768,22 @@ changeButtons(1);
 			simulationInterval =0;
 			changeButtons(1);
 		}
-		var paces=[1000,500,250,125,50,25];
-		var FEpaces=[1000,500,250,250,250,250];
-		var stepsArr = [1,1,1,2,6,13]
+		var paces=[1000,500,250,120,50,16];
+		var stepsArr = [1,1,1,2,5,15]
 		currPace=0;
 		paceDown.onclick = function() {
 			if(currPace>0){
 				clearInterval(simulationInterval);
 				currPace-=1;
-				if(simulationInterval) simulationInterval=setInterval(()=>runMode(stepsArr[currPace]),stepCalculations(paces[currPace],stepsArr[currPace]));
+				if(simulationInterval) simulationInterval=setInterval(()=>runMode(stepsArr[currPace]),paces[currPace]*stepsArr[currPace]);
 				updatePaceDisplay();
 			}
 		}
-		function stepCalculations(pace, stepss){
-			retval1 = (pace*stepss)
-			retval2 = (480-(counter%480))
-			return (retval1 > retval2) ? retval2 : retval1;
-		}
-
 		paceUp.onclick = function() {
 			if(currPace<5) {
 				clearInterval(simulationInterval);
 				currPace+=1;
-				if(simulationInterval) simulationInterval=setInterval(()=>runMode(stepsArr[currPace]),stepCalculations(paces[currPace],stepsArr[currPace]));
+				if(simulationInterval) simulationInterval=setInterval(()=>runMode(stepsArr[currPace]),paces[currPace]*stepsArr[currPace]);
 				updatePaceDisplay();
 			}
 		}
