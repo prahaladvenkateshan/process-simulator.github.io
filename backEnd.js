@@ -116,7 +116,8 @@ function runMode (steps){
 	let remainingTime = (480-(counter%480))
 	if(remainingTime< steps) steps = remainingTime;
 	for(walker=0;walker < steps; walker++){
-		//console.log("current minute: "+counter);counter++;
+		//console.log("current minute: "+counter);
+		counter++;
 		globalTimeKeeper.min+=1;
 		//if(Number.isInteger(globalTimeKeeper.min)){
 		incrementGlobalTimeKeeperMinutes();
@@ -655,7 +656,7 @@ metadataParser = function(metadataObj) {
 
 	//populate financial data
 	
-	layer.add(globalFinanceObj.currCash);
+	layer.add(globalFinanceObj.currCash)currCash;
 	layer.add(globalFinanceObj.cashDescriber);
 	layer.add(globalFinanceObj.fixedExp);
 	layer.add(globalFinanceObj.fixedExpDescriber);
