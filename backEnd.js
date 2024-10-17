@@ -656,7 +656,7 @@ metadataParser = function(metadataObj) {
 
 	//populate financial data
 	
-	layer.add(globalFinanceObj.currCash)currCash;
+	layer.add(globalFinanceObj.currCash);
 	layer.add(globalFinanceObj.cashDescriber);
 	layer.add(globalFinanceObj.fixedExp);
 	layer.add(globalFinanceObj.fixedExpDescriber);
