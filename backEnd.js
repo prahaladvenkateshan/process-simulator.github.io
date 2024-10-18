@@ -756,7 +756,6 @@ assignResourceToTask = function (ResourceCompObject,x1,y1,x2,y2){
 					else {
 						extraMachineArr.pop();
 						processFEObjs?.extraMachines?.pop();
-						processFEObjs[x1][y1].multipleMachines();
 					}
 				}
 	        	else {
@@ -778,7 +777,6 @@ assignResourceToTask = function (ResourceCompObject,x1,y1,x2,y2){
 			if(newMachine){
 				if(pg?.extraMachines?.length) pg.extraMachines?.push(pgNew);
 				else pg['extraMachines'] = [pgNew];
-				processFEObjs[x2][y2].multipleMachines();
 				let newEntry = {
 					resourceX: ResourceCompObject.attrs.i,
 					resourceY: ResourceCompObject.attrs.j,
