@@ -181,6 +181,7 @@ WS = function(x,y,fillColor,distrib,mean,sd,pos_x,pos_y,prevArray,nextArray){
     //properties
     this.active=true;
     var processingTime=0;
+    this.machineCount=0;
     this.distrib=distrib;
     this.mean=mean;
     this.sd=sd;
@@ -199,6 +200,27 @@ WS = function(x,y,fillColor,distrib,mean,sd,pos_x,pos_y,prevArray,nextArray){
         var hmm=tempRunning.getAttr('fillColor');
         tempRunning.setAttr('fill',hmm);
     }
+    this.assign = function(){
+        console.log(this,WSid);
+        this.machineCount++;
+        var text = layer.find('#WSText'+WSid)[0];
+        let txt = this.processingTime;
+        if(this.machineCount) txt= "+"+txt;
+    	text.setAttr('text', txt);
+    	layer.draw();
+        console.log(text,txt,layer);
+    }
+    
+    this.deassign = function(){
+        console.log(this);
+        this.machineCount--;
+        var text = layer.find('#WSText'+WSid)[0];
+        let txt = this.processingTime;
+        if(this.machineCount) txt= "+"+txt;
+    	text.setAttr('text', txt);
+    	layer.draw();
+    }
+    
     var ctr1=0;
     for (ctr1=0;ctr1<nextArray.length;ctr1++){
         this.nextIDs.push(nextArray[ctr1]);

@@ -156,7 +156,7 @@ function runMode (steps){
 								resourceUtilization[pgNew.type].repair+=1;
 								if(pgNew.timeSinceRepair>=pgNew.currRepairTime){
 									pgNew.status=2;
-									if(machine) resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX].updateResourceStatusText("prod");
+									if(machine) resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY].updateResourceStatusText("prod");
 									else resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
 									continue;
 								}
@@ -170,11 +170,11 @@ function runMode (steps){
 								if(pgNew.timeSinceSetup>=pg.setupTime || pg.setupTime==0){
 									pgNew.status=2; //mark it as running
 									if(machine){
-										resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX].updateResourceStatusText("idle");
+										resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY].updateResourceStatusText("idle");
 									}
 									else{
 										resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("idle");
-										if(!pg?.extraMachines?.length) processFEObjs[i][j].running();
+										//if(!pg?.extraMachines?.length) processFEObjs[i][j].running();
 									}
 								}
 								continue;
@@ -202,7 +202,7 @@ function runMode (steps){
 									if(canRun!=pgNew.canRun){
 										pgNew.canRun=canRun;
 										if(machine){
-											resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX].updateResourceStatusText(canRun ? "prod": "idle");
+											resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY].updateResourceStatusText(canRun ? "prod": "idle");
 										} else {
 											resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText(canRun ? "prod": "idle");
 										}
@@ -218,6 +218,7 @@ function runMode (steps){
 										pgNew.productionMode=false;
 									}
 								} else {
+										//send to repair
 										pgNew.timeSinceBreakdown+=1;
 										if(pgNew.timeSinceBreakdown>=pgNew.currBreakDownTime){
 											pgNew.status=3;
@@ -227,10 +228,11 @@ function runMode (steps){
 											pgNew.timeSinceBreakdown=0;
 											console.log(pgNew.currBreakDownTime);
 											
-											if(machine) resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX].updateResourceStatusText("repair");
+											if(machine) resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY].updateResourceStatusText("repair");
 											else resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("repair");
 										}
 										else {
+											//new unit passed
 											pgNew.timeSinceProduction+=1;
 											resourceUtilization[pg.type].prod+=1;
 											if (pgNew.timeSinceProduction>=pg.procTime) {
@@ -750,8 +752,8 @@ assignResourceToTask = function (ResourceCompObject,x1,y1,x2,y2){
 					if(extraMachineArr?.length == 1) {
 						delete processGraph[x1][y1]['extraMachines'];
 						delete processFEObjs[x1][y1]['extraMachines'];
-						if(processGraph[x1][y1].status==2 || processGraph[x1][y1].status==3) processFEObjs[x1][y1].running();
-						else processFEObjs[x1][y1].notRunning();
+						// if(processGraph[x1][y1].status==2 || processGraph[x1][y1].status==3) processFEObjs[x1][y1].running();
+						// else processFEObjs[x1][y1].notRunning();
 					}
 					else {
 						extraMachineArr.pop();
@@ -765,8 +767,9 @@ assignResourceToTask = function (ResourceCompObject,x1,y1,x2,y2){
 						}
 					}
 					processGraph[x1][y1].status=0;
-					processFEObjs[x1][y1].notRunning();
+					//processFEObjs[x1][y1].notRunning();
 				}
+				processFEObjs[x1][y1]?.deassign();
 	        }
 			let pg=processGraph[x2][y2],newMachine=0;
 			if(pg.status) newMachine=1;
@@ -796,6 +799,7 @@ assignResourceToTask = function (ResourceCompObject,x1,y1,x2,y2){
 				processFEObjs[x2][y2].resourceX=ResourceCompObject.attrs.i;
 				processFEObjs[x2][y2].resourceY=ResourceCompObject.attrs.j;
 			}
+			processFEObjs[x2][y2]?.assign();
 	        ResourceCompObject.setAttr('assignedToX', x2);
 	        ResourceCompObject.setAttr('assignedToY', y2);
 	        resourceObjs[ResourceCompObject.attrs.i][ResourceCompObject.attrs.j].updateResourceText(String.fromCharCode(65+x2)+y2);
