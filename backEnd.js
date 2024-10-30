@@ -111,6 +111,9 @@ function FERefresh () {
 function minimum(a,b){
 	if(a<b) return a; return b;
 }
+function updateResourceStatusTextSelf (machine, text){
+	machine.updateResourceStatusText(text,machine?.ResourceComp,machine?.ResourceComp?.x(),machine?.ResourceComp?.y(),machine?.ResourceComp?.width(),machine?.ResourceComp?.height())
+}
 function runMode (steps){
 	if(!steps) steps =1;
 	let remainingTime = (480-(counter%480))
@@ -156,8 +159,8 @@ function runMode (steps){
 								resourceUtilization[pgNew.type].repair+=1;
 								if(pgNew.timeSinceRepair>=pgNew.currRepairTime){
 									pgNew.status=2;
-									if(machine) resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY].updateResourceStatusText("prod");
-									else resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("prod");
+									if(machine) updateResourceStatusTextSelf(resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY],"prod");
+									else updateResourceStatusTextSelf(resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY],"prod");
 									continue;
 								}
 							}
@@ -170,10 +173,10 @@ function runMode (steps){
 								if(pgNew.timeSinceSetup>=pg.setupTime || pg.setupTime==0){
 									pgNew.status=2; //mark it as running
 									if(machine){
-										resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY].updateResourceStatusText("idle");
+										updateResourceStatusTextSelf(resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY],"idle");
 									}
 									else{
-										resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("idle");
+										updateResourceStatusTextSelf(resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY],"idle");
 										//if(!pg?.extraMachines?.length) processFEObjs[i][j].running();
 									}
 								}
@@ -202,9 +205,9 @@ function runMode (steps){
 									if(canRun!=pgNew.canRun){
 										pgNew.canRun=canRun;
 										if(machine){
-											resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY].updateResourceStatusText(canRun ? "prod": "idle");
+											updateResourceStatusTextSelf(resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY],canRun ? "prod": "idle");
 										} else {
-											resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText(canRun ? "prod": "idle");
+											updateResourceStatusTextSelf(resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY],canRun ? "prod": "idle");
 										}
 									}
 									if (canRun) {
@@ -228,8 +231,8 @@ function runMode (steps){
 											pgNew.timeSinceBreakdown=0;
 											console.log(pgNew.currBreakDownTime);
 											
-											if(machine) resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY].updateResourceStatusText("repair");
-											else resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY].updateResourceStatusText("repair");
+											if(machine) updateResourceStatusTextSelf(resourceObjs[processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceX][processFEObjs[i][j]?.extraMachines?.[machine-1]?.resourceY],"repair");
+											else updateResourceStatusTextSelf(resourceObjs[processFEObjs[i][j].resourceX][processFEObjs[i][j].resourceY],"repair");
 										}
 										else {
 											//new unit passed
@@ -710,7 +713,7 @@ checkWhichBox= function(position,type) {
 	  //       type.setAttr('assignedToX', xx);
 	  //       type.setAttr('assignedToY', yy);
 	  //       resourceObjs[type.attrs.i][type.attrs.j].updateResourceText(xx+","+yy);
-	  //       resourceObjs[type.attrs.i][type.attrs.j].updateResourceStatusText("setup");
+	  //       updateResourceStatusTextSelf(resourceObjs[type.attrs.i][type.attrs.j],"setup");
 		} else {
 			type.setAttr('opacity', 0);
 	        type.setAttr('x', type.attrs.original_x);
@@ -803,7 +806,7 @@ assignResourceToTask = function (ResourceCompObject,x1,y1,x2,y2){
 	        ResourceCompObject.setAttr('assignedToX', x2);
 	        ResourceCompObject.setAttr('assignedToY', y2);
 	        resourceObjs[ResourceCompObject.attrs.i][ResourceCompObject.attrs.j].updateResourceText(String.fromCharCode(65+x2)+y2);
-	        resourceObjs[ResourceCompObject.attrs.i][ResourceCompObject.attrs.j].updateResourceStatusText("setup");
+	        updateResourceStatusTextSelf(resourceObjs[ResourceCompObject.attrs.i][ResourceCompObject.attrs.j],"setup");
 	        var tempmin="";
 			if(globalTimeKeeper.min<10){tempmin="0"+globalTimeKeeper.min;} else {tempmin=globalTimeKeeper.min}
 	activityLog.push('Week '+globalTimeKeeper.week+' Day '+globalTimeKeeper.day+' 0'+globalTimeKeeper.hr+':'+tempmin+'\nAssigned '+resourceColourList[ResourceCompObject.attrs.type/1]+' to task at '+String.fromCharCode(65+x2)+''+y2);
